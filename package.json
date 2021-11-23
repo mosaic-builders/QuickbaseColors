@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "yarn uglifyjs quickbase-colors.js -o dist.js; echo \"javascript: $(cat dist.js)\" > dist.js"
+    "build": "yarn run uglifyjs quickbase-colors.js -o dist.js; echo \"javascript: $(cat dist.js)\" > dist.js"
   },
   "dependencies": {
     "uglify-js": "^3.14.3"
