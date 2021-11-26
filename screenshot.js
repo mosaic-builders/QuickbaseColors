@@ -1,9 +1,12 @@
+'use strict';
 
 const puppeteer = require('puppeteer')
+const {getChrome} = require('./chrome.js')
+
 const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3")
 
 const config = require('./config.js')
-const { readFile } = require('fs/promises')
+const { readFile } = require('fs').promises
 
 function delay(ms) {
     return new Promise(function (resolve) {
@@ -23,7 +26,7 @@ async function putFile(client, bucket, key, body) {
     return response
 }
 
-(async () => {
+async function main() {
     try {
         let clientS3 = new S3Client({
             credentials: {
@@ -35,7 +38,16 @@ async function putFile(client, bucket, key, body) {
     
         const plugin = (await readFile('./quickbase-colors.js')).toString()
 
-        const browser = await puppeteer.launch({ headless: true });
+        const chrome = await getChrome()
+
+        // const browser = await puppeteer.launch({ 
+        //     headless: true,
+        // });
+
+        const browser = await puppeteer.connect({
+            browserWSEndpoint: chrome.endpoint
+        })
+
         const page = await browser.newPage();
 
         await page.goto('https://davideverson.quickbase.com/db/main?a=SignIn');
@@ -102,6 +114,16 @@ async function putFile(client, bucket, key, body) {
         console.log('Error!', e)
     }
     
-})();
+}
 
+let handler = async (event, context) => {
+    const time = new Date();
+    await main()
+    // console.log(`Your cron function "${context.functionName}" ran at ${time}`);
+  };
+  
+  
 
+module.exports.run = handler
+
+handler()

@@ -1,0 +1,28 @@
+service: quickbase-colorized-exports
+
+frameworkVersion: '2 || 3'
+
+useDotenv: true
+
+plugins:
+  - serverless-plugin-chrome
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  region: us-west-1
+  environment:
+    AMAZON_AWS_ACCESS_KEY_ID: ${env:AMAZON_AWS_ACCESS_KEY_ID}
+    AMAZON_AWS_SECRET_ACCESS_KEY: ${env:AMAZON_AWS_SECRET_ACCESS_KEY}
+    S3_BUCKET: ${env:S3_BUCKET}
+
+package:
+  exclude:
+    - node_modules/puppeteer/.local-chromium/**
+
+functions:
+  cronHandler:
+    handler: screenshot.run
+    events:
+      - schedule: cron(0 0 ? * * *)
