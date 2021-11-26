@@ -3,6 +3,10 @@
     "build": "yarn run uglifyjs quickbase-colors.js -o dist.js; echo \"javascript: $(cat dist.js)\" > dist.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.42.0",
+    "dotenv": "^10.0.0",
+    "luxon": "^2.1.1",
+    "puppeteer": "^11.0.0",
     "uglify-js": "^3.14.3"
   }
 }
