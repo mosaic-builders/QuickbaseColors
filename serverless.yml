@@ -4,25 +4,28 @@ frameworkVersion: '2 || 3'
 
 useDotenv: true
 
-plugins:
-  - serverless-plugin-chrome
-
 provider:
+  lambdaHashingVersion: 20201221
+
   name: aws
   runtime: nodejs12.x
-  lambdaHashingVersion: 20201221
   region: us-west-1
+  memorySize: 4096
+  timeout: 600
+  
+  ecr:
+    images:
+      screenshot-image:
+        path: ./
+
   environment:
     AMAZON_AWS_ACCESS_KEY_ID: ${env:AMAZON_AWS_ACCESS_KEY_ID}
     AMAZON_AWS_SECRET_ACCESS_KEY: ${env:AMAZON_AWS_SECRET_ACCESS_KEY}
     S3_BUCKET: ${env:S3_BUCKET}
 
-package:
-  exclude:
-    - node_modules/puppeteer/.local-chromium/**
-
 functions:
-  cronHandler:
-    handler: screenshot.run
+  screenshot:
+    image:
+      name: screenshot-image
     events:
       - schedule: cron(0 0 ? * * *)
