@@ -1,6 +1,9 @@
 'use strict';
 
-const puppeteer = require('puppeteer')
+// const puppeteer = require('puppeteer')
+const puppeteer = require("puppeteer-core");
+const chrome = require("chrome-aws-lambda");
+
 const { PutObjectCommand, DeleteObjectCommand, S3Client } = require("@aws-sdk/client-s3")
 
 const config = require('./config.js')
@@ -47,15 +50,21 @@ async function main() {
 
         const plugin = (await readFile('./quickbase-colors.js')).toString()
 
-        const browser = await puppeteer.launch({ 
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--single-process'
-            ],      
+        // const browser = await puppeteer.launch({ 
+        //     args: [
+        //         '--no-sandbox',
+        //         '--disable-setuid-sandbox',
+        //         '--disable-dev-shm-usage',
+        //         '--single-process'
+        //     ],      
+        //     headless: true
+        // })
+
+        const browser = await puppeteer.launch({
+            executablePath: await chrome.executablePath,
+            args: chrome.args,
             headless: true
-        })
+          });
 
         const page = await browser.newPage();
 
@@ -137,5 +146,3 @@ let handler = async (event, context) => {
 };
 
 module.exports.run = handler
-
-handler()
