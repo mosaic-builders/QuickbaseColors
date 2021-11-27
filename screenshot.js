@@ -197,19 +197,19 @@ https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulati
 
 let handler = async (event, context) => {
 
-
-
     const time = new Date();
     let body = await main()
     console.log(`Screenshot function ran at ${time}`);
-    return {
-        "statusCode": 200,
-        "body": [
-            "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/StartToFrameReady.pdf",
-            "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToMpeReady.pdf",
-            "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf"
-        ]
 
+    return {
+        "statusCode": "200",
+        "body": JSON.stringify({
+            "reports": [
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/StartToFrameReady.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToMpeReady.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf"
+            ]
+        })
     }
 };
 

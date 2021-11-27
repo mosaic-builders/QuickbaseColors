@@ -20,7 +20,7 @@ functions:
     memorySize: 4096
     timeout: 600
     events:
-      - schedule: cron(0 0 ? * * *)
+      - schedule: cron(0 8 * * ? *)
       - http:
           path: force
           method: get
