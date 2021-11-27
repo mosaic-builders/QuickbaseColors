@@ -5,6 +5,8 @@ const puppeteer = require("puppeteer-core");
 const chrome = require("chrome-aws-lambda");
 
 const { PutObjectCommand, DeleteObjectCommand, S3Client } = require("@aws-sdk/client-s3")
+const { SNSClient, PublishCommand } = require("@aws-sdk/client-sns");
+
 
 const config = require('./config.js')
 const { readFile } = require('fs').promises
@@ -65,6 +67,15 @@ async function main() {
             region: "us-west-1"
         });
 
+        const clientSNS = new SNSClient({
+            credentials: {
+                accessKeyId: config.AMAZON_AWS_ACCESS_KEY_ID,
+                secretAccessKey: config.AMAZON_AWS_SECRET_ACCESS_KEY
+            },
+            region: "us-west-1"
+        })
+
+
         const plugin = (await readFile('./quickbase-colors.js')).toString()
 
         // const browser = await puppeteer.launch({ 
@@ -81,7 +92,7 @@ async function main() {
             executablePath: await chrome.executablePath,
             args: chrome.args,
             headless: true
-          });
+        });
 
         const page = await browser.newPage();
 
@@ -133,8 +144,7 @@ async function main() {
 
         await browser.close();
 
-        
-        return `
+        let body = `
 Hello! The latest versions of the Quickbase reports are available.
 
 StartToFrameReady
@@ -146,6 +156,39 @@ https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToM
 MpeToInsulationReady
 https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf
 `
+
+        const command = new PublishCommand({
+            Message: body,
+            TopicArn: 'arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer',
+            Subject: 'Quickbase Exports'
+        })
+
+        // const command = new SendEmailCommand({
+        //     Destination: {
+        //         ToAddresses: [
+        //             'salman@mosaic.us'
+        //         ]
+        //     },
+        //     Content: {
+        //         Simple: {
+        //             Body: {
+        //                 Text: {
+        //                     Charset: "UTF-8",
+        //                     Data: body
+        //                 }
+        //             },
+        //             Subject: {
+        //                 Charset: "UTF-8",
+        //                 Data: 'Subject'
+        //             }
+        //         }
+        //     }
+        // });
+
+        // const response = await clientSES.send(command);
+
+        const response = await clientSNS.send(command);
+
     } catch (e) {
         console.log('Error!', e)
     }
@@ -153,12 +196,19 @@ https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulati
 }
 
 let handler = async (event, context) => {
+
+
+
     const time = new Date();
     let body = await main()
     console.log(`Screenshot function ran at ${time}`);
     return {
         "statusCode": 200,
-        "body": body
+        "body": [
+            "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/StartToFrameReady.pdf",
+            "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToMpeReady.pdf",
+            "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf"
+        ]
 
     }
 };
