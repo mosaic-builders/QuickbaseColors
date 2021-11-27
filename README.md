@@ -1,3 +1,8 @@
+https://www.techmagic.co/blog/running-headless-chrome-with-aws-lambda-layers/
+
+
+----
+
 <!--
 title: 'AWS Node Scheduled Cron example in NodeJS'
 description: 'This is an example of creating a function that runs as a cron job using the serverless ''schedule'' event.'

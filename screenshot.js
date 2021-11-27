@@ -40,6 +40,23 @@ async function putFile(client, bucket, key, body) {
 
 async function main() {
     try {
+        let reports = [{
+            name: 'StartToFrameReady',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=323',
+            width: 5000,
+            height: 3000
+        }, {
+            name: 'FrameRoughToMpeReady',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=326',
+            width: 5000,
+            height: 3000
+        }, {
+            name: 'MpeToInsulationReady',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=332',
+            width: 5000,
+            height: 3000
+        }]
+
         let clientS3 = new S3Client({
             credentials: {
                 accessKeyId: config.AMAZON_AWS_ACCESS_KEY_ID,
@@ -86,23 +103,6 @@ async function main() {
         let date = new Date()
         let timestamp = date.toISOString()
 
-        let reports = [{
-            name: 'StartToFrameReady',
-            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=323',
-            width: 5000,
-            height: 3000
-        }, {
-            name: 'FrameRoughToMpeReady',
-            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=326',
-            width: 5000,
-            height: 3000
-        }, {
-            name: 'MpeToInsulationReady',
-            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=332',
-            width: 5000,
-            height: 3000
-        }]
-
         for (let report of reports) {
             console.log('Processing report ' + report.name)
 
@@ -132,6 +132,20 @@ async function main() {
         }
 
         await browser.close();
+
+        
+        return `
+Hello! The latest versions of the Quickbase reports are available.
+
+StartToFrameReady
+https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/StartToFrameReady.pdf
+
+FrameRoughToMpeReady
+https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToMpeReady.pdf
+
+MpeToInsulationReady
+https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf
+`
     } catch (e) {
         console.log('Error!', e)
     }
@@ -140,9 +154,13 @@ async function main() {
 
 let handler = async (event, context) => {
     const time = new Date();
-    await main()
+    let body = await main()
     console.log(`Screenshot function ran at ${time}`);
-    return "Hello, World!"
+    return {
+        "statusCode": 200,
+        "body": body
+
+    }
 };
 
 module.exports.run = handler

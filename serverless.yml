@@ -21,6 +21,15 @@ functions:
     timeout: 600
     events:
       - schedule: cron(0 0 ? * * *)
+      - http:
+          path: force
+          method: get
     layers:
       - arn:aws:lambda:us-west-1:764866452798:layer:chrome-aws-lambda:25
+    destinations:
+      onSuccess: arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer
+      onFailure: arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer
+
+
+
 
