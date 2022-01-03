@@ -39,12 +39,12 @@
         let index = children.indexOf(cell)
         let header = headers[index]
 
-        let validHeaderPattern = /(\d\d\d) \((Revised|Actual) Finish\)$/
+        let validHeaderPattern = /((\d\d\d)|(QA\d)) \((Revised|Actual) Finish\)$/
         let match = header.match(validHeaderPattern)
 
         if(match === null || match === undefined) return
 
-        let isActualFinish = match[2] === 'Actual'
+        let isActualFinish = match[4] === 'Actual'
 
         if(!isActualFinish) return
         if(value !== '') return
