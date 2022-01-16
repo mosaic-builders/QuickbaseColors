@@ -71,12 +71,18 @@
         let revisedFinishWeek = getWeekId(revisedFinishDate)
 
         const yellow = "#fff2cc"
+        const yellowDark = "#efba2c"
         const red = "#f4cccc"
         const green = "#d9ead3"
 
         if(revisedFinishWeek === thisWeek) {
-            cell.style.backgroundColor = yellow
-            cell.previousSibling.style.backgroundColor = yellow
+            if(now >= revisedFinishDate) {
+                cell.style.backgroundColor = yellowDark
+                cell.previousSibling.style.backgroundColor = yellowDark
+            } else {
+                cell.style.backgroundColor = yellow
+                cell.previousSibling.style.backgroundColor = yellow
+            }
         } else if(revisedFinishWeek < thisWeek) {
             cell.style.backgroundColor = red
             cell.previousSibling.style.backgroundColor = red
