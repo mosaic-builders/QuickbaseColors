@@ -47,22 +47,18 @@
         let isActualFinish = match[4] === 'Actual'
 
         if(!isActualFinish) return
-        if(value !== '') return
+        // if(value !== '') return
 
         let revisedFinishValue = cell.previousSibling.innerText
 
         let dateComponents = revisedFinishValue.match(/(\d\d)-(\d\d)-(\d\d)/)
         if(dateComponents === null || dateComponents === undefined) return
 
-
-
         let revisedFinishDate = new Date(
             2000 + parseInt(dateComponents[3]),
             parseInt(dateComponents[1]) - 1,
             parseInt(dateComponents[2]),
         )
-
-        
 
         let now = new Date()
         let thisWeek = getWeekId(now)
@@ -71,24 +67,27 @@
         let revisedFinishWeek = getWeekId(revisedFinishDate)
 
         const yellow = "#fff2cc"
-        const yellowDark = "#efba2c"
         const red = "#f4cccc"
         const green = "#d9ead3"
+        const blue = "#c9daf8"
 
         if(revisedFinishWeek === thisWeek) {
-            if(now >= revisedFinishDate) {
-                cell.style.backgroundColor = yellowDark
-                cell.previousSibling.style.backgroundColor = yellowDark
+            if(value !== '') {
+                cell.style.backgroundColor = green
+                cell.previousSibling.style.backgroundColor = green
             } else {
                 cell.style.backgroundColor = yellow
                 cell.previousSibling.style.backgroundColor = yellow
             }
-        } else if(revisedFinishWeek < thisWeek) {
-            cell.style.backgroundColor = red
-            cell.previousSibling.style.backgroundColor = red
-        } else if(revisedFinishWeek === nextWeek) {
-            cell.style.backgroundColor = green
-            cell.previousSibling.style.backgroundColor = green
+        } else if(value === '') {
+            if(revisedFinishWeek < thisWeek) {
+            
+                cell.style.backgroundColor = red
+                cell.previousSibling.style.backgroundColor = red
+            } else if(revisedFinishWeek === nextWeek) {
+                cell.style.backgroundColor = blue
+                cell.previousSibling.style.backgroundColor = blue
+            }       
         }
 
         console.log(index, header, value, revisedFinishValue, revisedFinishDate, getWeekId(revisedFinishDate))
