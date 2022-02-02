@@ -18,7 +18,7 @@ functions:
   screenshot:
     handler: screenshot.run
     memorySize: 4096
-    timeout: 600
+    timeout: 900
     events:
       - schedule: cron(0 8 * * ? *)
       - http:
@@ -27,8 +27,8 @@ functions:
     layers:
       - arn:aws:lambda:us-west-1:764866452798:layer:chrome-aws-lambda:25
     destinations:
-      onSuccess: arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer
-      onFailure: arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer
+      onSuccess: arn:aws:sns:us-west-1:809059647686:GeneralDebug
+      onFailure: arn:aws:sns:us-west-1:809059647686:GeneralDebug
 
 
 

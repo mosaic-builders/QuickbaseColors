@@ -43,18 +43,33 @@ async function putFile(client, bucket, key, body) {
 async function main() {
     try {
         let reports = [{
-            name: 'StartToFrameReady',
-            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=323',
-            width: 5000,
+            name: 'ActivityGroup.2',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=390',
+            width: 8000,
             height: 3000
         }, {
-            name: 'FrameRoughToMpeReady',
+            name: 'ActivityGroup.2a',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=391',
+            width: 8000,
+            height: 3000
+        }, {
+            name: 'ActivityGroup.2b',
             url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=326',
             width: 5000,
             height: 3000
         }, {
-            name: 'MpeToInsulationReady',
-            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=332',
+            name: 'ActivityGroup.3',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=389',
+            width: 5000,
+            height: 3000
+        }, {
+            name: 'ActivityGroup.3a',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=392',
+            width: 5000,
+            height: 3000
+        }, {
+            name: 'ActivityGroup.3b',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=393',
             width: 5000,
             height: 3000
         }]
@@ -78,16 +93,6 @@ async function main() {
 
         const plugin = (await readFile('./quickbase-colors.js')).toString()
 
-        // const browser = await puppeteer.launch({ 
-        //     args: [
-        //         '--no-sandbox',
-        //         '--disable-setuid-sandbox',
-        //         '--disable-dev-shm-usage',
-        //         '--single-process'
-        //     ],      
-        //     headless: true
-        // })
-
         const browser = await puppeteer.launch({
             executablePath: await chrome.executablePath,
             args: chrome.args,
@@ -101,8 +106,8 @@ async function main() {
         await page.waitForSelector('input[name=loginid]');
         await page.waitForSelector('input[name=password]');
 
-        await page.$eval('input[name=loginid]', el => el.value = 'ed@mosaic.us');
-        await page.$eval('input[name=password]', el => el.value = 'XL.!qc2RhRn64JZjqnqs');
+        await page.$eval('input[name=loginid]', el => el.value = 'salman@mosaic.us');
+        await page.$eval('input[name=password]', el => el.value = 'fys}z3Z>cAc');
 
         await delay(2000)
 
@@ -118,15 +123,34 @@ async function main() {
             console.log('Processing report ' + report.name)
 
             await page.setViewport({
-                width: report.width,
-                height: report.height
+                width: 1000,
+                height: report.height,
             });
 
             await page.goto(report.url, {
                 waitUntil: 'networkidle2'
             });
 
+            await page.evaluate(() => {
+                document.querySelector("table[role='grid']").scrollBy(3000,0)
+            })
+
+            await delay(1000)
+
+            await page.evaluate(() => {
+                document.querySelector("table[role='grid']").scrollBy(3000,0)
+            })
+
+            await delay(1000)
+
             await page.evaluate(plugin)
+
+            await page.setViewport({
+                width: report.width,
+                height: report.height,
+            });
+
+            await delay(2000)
 
             let buffer = await page.pdf({
                 // path: `${report.name}.pdf`,
@@ -144,48 +168,18 @@ async function main() {
 
         await browser.close();
 
-        let body = `
-Hello! The latest versions of the Quickbase reports are available.
+        let body = `\nHello! The latest versions of the Quickbase reports are available.\n`
 
-StartToFrameReady
-https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/StartToFrameReady.pdf
-
-FrameRoughToMpeReady
-https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToMpeReady.pdf
-
-MpeToInsulationReady
-https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf
-`
+        for(let report of reports) {
+            body += `\n${report.name}:     \thttps://${config.S3_BUCKET}.s3.us-west-1.amazonaws.com/latest/${report.name}.pdf\n`
+        }
 
         const command = new PublishCommand({
             Message: body,
-            TopicArn: 'arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer',
+            TopicArn: 'arn:aws:sns:us-west-1:809059647686:GeneralDebug',
+            // TopicArn: 'arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer',
             Subject: 'Quickbase Exports'
         })
-
-        // const command = new SendEmailCommand({
-        //     Destination: {
-        //         ToAddresses: [
-        //             'salman@mosaic.us'
-        //         ]
-        //     },
-        //     Content: {
-        //         Simple: {
-        //             Body: {
-        //                 Text: {
-        //                     Charset: "UTF-8",
-        //                     Data: body
-        //                 }
-        //             },
-        //             Subject: {
-        //                 Charset: "UTF-8",
-        //                 Data: 'Subject'
-        //             }
-        //         }
-        //     }
-        // });
-
-        // const response = await clientSES.send(command);
 
         const response = await clientSNS.send(command);
 
@@ -205,9 +199,12 @@ let handler = async (event, context) => {
         "statusCode": "200",
         "body": JSON.stringify({
             "reports": [
-                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/StartToFrameReady.pdf",
-                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/FrameRoughToMpeReady.pdf",
-                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/MpeToInsulationReady.pdf"
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.2.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.2a.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.2b.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.3.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.3a.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.3b.pdf",
             ]
         })
     }
