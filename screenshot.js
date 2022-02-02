@@ -176,8 +176,8 @@ async function main() {
 
         const command = new PublishCommand({
             Message: body,
-            TopicArn: 'arn:aws:sns:us-west-1:809059647686:GeneralDebug',
-            // TopicArn: 'arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer',
+            // TopicArn: 'arn:aws:sns:us-west-1:809059647686:GeneralDebug',
+            TopicArn: 'arn:aws:sns:us-west-1:809059647686:QuickbaseExportsMailer',
             Subject: 'Quickbase Exports'
         })
 
