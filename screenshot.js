@@ -72,6 +72,21 @@ async function main() {
             url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=393',
             width: 5000,
             height: 3000
+        }, {
+            name: 'ActivityGroup.4',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=294',
+            width: 6000,
+            height: 3000
+        }, {
+            name: 'ActivityGroup.4a',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=395',
+            width: 5000,
+            height: 3000
+        }, {
+            name: 'ActivityGroup.4b',
+            url: 'https://davideverson.quickbase.com/db/bqgj56f3v?a=q&qid=394',
+            width: 5000,
+            height: 3000
         }]
 
         let clientS3 = new S3Client({
@@ -94,8 +109,10 @@ async function main() {
         const plugin = (await readFile('./quickbase-colors.js')).toString()
 
         const browser = await puppeteer.launch({
+            // /*
             executablePath: await chrome.executablePath,
             args: chrome.args,
+            // */
             headless: true
         });
 
@@ -161,9 +178,11 @@ async function main() {
 
             console.log(config.S3_BUCKET, buffer.byteLength)
 
+            // /*
             await deleteFile(clientS3, config.S3_BUCKET, `latest/${report.name}.pdf`)
             await putFile(clientS3, config.S3_BUCKET, `latest/${report.name}.pdf`, buffer)
             await putFile(clientS3, config.S3_BUCKET, `archive/${report.name}-${timestamp}.pdf`, buffer)
+            // */
         }
 
         await browser.close();
@@ -205,6 +224,9 @@ let handler = async (event, context) => {
                 "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.3.pdf",
                 "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.3a.pdf",
                 "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.3b.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.4.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.4a.pdf",
+                "https://mosaic-quickbase-exports.s3.us-west-1.amazonaws.com/latest/ActivityGroup.4b.pdf",
             ]
         })
     }
